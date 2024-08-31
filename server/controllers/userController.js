@@ -38,29 +38,21 @@ export async function getAllUsers(req, res) {
 }
 
 // Function to create a new user
-// export async function createUser(req, res) {
-//   try {
-//     const user = new User(req.body);
-    
-//     // Verify document using Cashfree
-//     const documentDetails = {
-//       documentType: 'Aadhar',
-//       documentNumber: user.governmentIdNumber,
-//     };
+export async function createUser(req, res) {
+  try {
+    const user = new User(req.body);
 
-//     const verificationResult = await verifyDocument(documentDetails);
+    // Setting default values for verification statuses
+    user.isEmailVerified = false;
+    user.isPhoneVerified = false;
+    user.isDocumentVerified = false;
 
-//     if (verificationResult.status !== 'SUCCESS') {
-//       throw new Error('Document verification failed');
-//     }
-
-//     user.isDocumentVerified = true;
-//     await user.save();
-//     res.status(201).send(user);
-//   } catch (error) {
-//     res.status(400).send({ message: 'Failed to create user', error: error.message });
-//   }
-// }
+    await user.save();
+    res.status(201).send(user);
+  } catch (error) {
+    res.status(400).send({ message: 'Failed to create user', error: error.message });
+  }
+}
 
 // Function to retrieve a user by ID
 export async function getUser(req, res) {
@@ -85,26 +77,10 @@ export async function updateUser(req, res) {
     }
 
     // Update allowed fields
-    const allowedUpdates = ['firstName', 'lastName', 'email', 'phoneNumber', 'governmentIdNumber'];
+    const allowedUpdates = ['firstName', 'lastName', 'email', 'phoneNumber', 'governmentIdNumber', 'profilePic', 'dob', 'address', 'baseLocation', 'subLocation', 'workType', 'experience', 'profession', 'currentEmployeerName'];
     allowedUpdates.forEach(field => {
       if (updates[field] !== undefined) user[field] = updates[field];
     });
-
-    // If updating government ID number, re-verify the document
-    if (updates.governmentIdNumber) {
-      const documentDetails = {
-        documentType: 'Aadhar',
-        documentNumber: updates.governmentIdNumber,
-      };
-
-      const verificationResult = await verifyDocument(documentDetails);
-
-      if (verificationResult.status !== 'SUCCESS') {
-        throw new Error('Document verification failed');
-      }
-
-      user.isDocumentVerified = true;
-    }
 
     await user.save();
     res.send(user);
