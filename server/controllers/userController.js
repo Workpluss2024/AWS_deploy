@@ -1,4 +1,3 @@
-import { verifyDocument } from '../services/cashfreeService.js';
 import User from '../models/User.js';
 
 // Function to handle user login
@@ -39,29 +38,29 @@ export async function getAllUsers(req, res) {
 }
 
 // Function to create a new user
-export async function createUser(req, res) {
-  try {
-    const user = new User(req.body);
+// export async function createUser(req, res) {
+//   try {
+//     const user = new User(req.body);
     
-    // Verify document using Cashfree
-    const documentDetails = {
-      documentType: 'Aadhar',
-      documentNumber: user.governmentIdNumber,
-    };
+//     // Verify document using Cashfree
+//     const documentDetails = {
+//       documentType: 'Aadhar',
+//       documentNumber: user.governmentIdNumber,
+//     };
 
-    const verificationResult = await verifyDocument(documentDetails);
+//     const verificationResult = await verifyDocument(documentDetails);
 
-    if (verificationResult.status !== 'SUCCESS') {
-      throw new Error('Document verification failed');
-    }
+//     if (verificationResult.status !== 'SUCCESS') {
+//       throw new Error('Document verification failed');
+//     }
 
-    user.isDocumentVerified = true;
-    await user.save();
-    res.status(201).send(user);
-  } catch (error) {
-    res.status(400).send({ message: 'Failed to create user', error: error.message });
-  }
-}
+//     user.isDocumentVerified = true;
+//     await user.save();
+//     res.status(201).send(user);
+//   } catch (error) {
+//     res.status(400).send({ message: 'Failed to create user', error: error.message });
+//   }
+// }
 
 // Function to retrieve a user by ID
 export async function getUser(req, res) {
