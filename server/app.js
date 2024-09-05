@@ -25,6 +25,7 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
   console.log('Connected to MongoDB');
 }).catch(err => {
   console.error('Could not connect to MongoDB:', err);
+  process.exit(1); // Terminate app if database connection fails
 });
 
 // Use routes
@@ -43,6 +44,6 @@ app.get('/', (req, res) => {
 
 // Set the port the server will listen on
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });
