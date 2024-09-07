@@ -14,7 +14,7 @@ import tokenRoutes from './routes/tokenRoutes.js';
 import ratingRoutes from './routes/ratingRoutes.js';
 import applicationRoutes from './routes/applicationRoutes.js';
 import feedbackRoutes from './routes/feedbackRoutes.js';
-
+import listRoutes from './routes/staticlistRoutes.js';
 const app = express();
 
 app.use(cors());
@@ -36,6 +36,7 @@ app.use('/api/tokens', tokenRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/feedbacks', feedbackRoutes);
+app.use('/api/lists', listRoutes);
 
 // Define a route for the root of the app
 app.get('/', (req, res) => {
