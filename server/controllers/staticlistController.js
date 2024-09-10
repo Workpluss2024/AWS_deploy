@@ -19,3 +19,12 @@ export function getLanguageList(req, res) {
   ];
   res.status(200).json(languages);
 }
+
+// Fetch the static list of duration(jobs)
+export function getDurationList(req, res) {
+    const durations = [
+        { uuid: uuidv4(), name: 'Flexible (Daily Jobs)'},
+        { uuid: uuidv4(), name: 'Steady (Long term Jobs)'}
+    ];
+    res.status(200).json(durations);
+}
