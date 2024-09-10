@@ -1,4 +1,9 @@
 import User from '../models/User.js';
+import jwt from 'jsonwebtoken';
+
+// Static lists for genders and languages
+const validGenders = ['Male', 'Female', 'Prefer not to say'];
+const validLanguages = ['English', 'Hindi', 'Marathi'];
 
 // Function to handle user login
 export async function loginUser(req, res) {
@@ -19,9 +24,13 @@ export async function loginUser(req, res) {
     user.lastLogin = new Date();
     await user.save();
 
-    // Return user information (excluding password)
-    const { password: _, ...userInfo } = user.toObject(); 
-    res.send({ message: 'Login successful', user: userInfo });
+    // Generate JWT token
+    const token = jwt.sign({ uuid: user.uuid }, process.env.JWT_SECRET, {
+      expiresIn: '1h'
+    });
+
+    // Send only the token
+    res.send({ token });
   } catch (error) {
     res.status(500).send({ message: 'Failed to login', error: error.message });
   }
@@ -39,16 +48,47 @@ export async function getAllUsers(req, res) {
 
 // Function to create a new user
 export async function createUser(req, res) {
+  const {
+    firstName, lastName, email, phone, password, gender, language,
+    dateOfBirth, birthCity, birthCountry, city, doorNumber, nearBy,
+    state, streetName, zipCode
+  } = req.body;
+
+  // Validate gender and language names from static lists
+  if (!validGenders.includes(gender.name)) {
+    return res.status(400).json({ message: `Invalid gender. Valid options are: ${validGenders.join(', ')}` });
+  }
+
+  if (!validLanguages.includes(language.name)) {
+    return res.status(400).json({ message: `Invalid language. Valid options are: ${validLanguages.join(', ')}` });
+  }
+
   try {
-    const user = new User(req.body);
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      phoneNumber: phone,
+      password,
+      gender: gender.name,  // Use the name from the gender object
+      language: language.name, // Use the name from the language object
+      dateOfBirth,
+      birthCity,
+      birthCountry,
+      city,
+      doorNumber,
+      nearBy,
+      state,
+      streetName,
+      zipCode,
+      isEmailVerified: false,
+      isPhoneVerified: false,
+      isDocumentVerified: false
+    });
 
-    // Setting default values for verification statuses
-    user.isEmailVerified = false;
-    user.isPhoneVerified = false;
-    user.isDocumentVerified = false;
-
+    // Save the user
     await user.save();
-    res.status(201).send(user);
+    res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
     res.status(400).send({ message: 'Failed to create user', error: error.message });
   }
@@ -77,7 +117,12 @@ export async function updateUser(req, res) {
     }
 
     // Update allowed fields
-    const allowedUpdates = ['firstName', 'lastName', 'email', 'phoneNumber', 'governmentIdNumber', 'profilePic', 'dob', 'address', 'baseLocation', 'subLocation', 'workType', 'experience', 'profession', 'currentEmployeerName'];
+    const allowedUpdates = [
+      'firstName', 'lastName', 'email', 'phoneNumber', 'governmentIdNumber', 
+      'profilePic', 'dob', 'address', 'baseLocation', 'subLocation', 'workType', 
+      'experience', 'profession', 'currentEmployeerName', 'birthCity', 'birthCountry', 
+      'city', 'doorNumber', 'nearBy', 'state', 'streetName', 'zipCode'
+    ];
     allowedUpdates.forEach(field => {
       if (updates[field] !== undefined) user[field] = updates[field];
     });
