@@ -88,7 +88,14 @@ export async function createUser(req, res) {
 
     // Save the user
     await user.save();
-    res.status(201).json({ message: 'User created successfully' });
+
+    // Generate JWT token
+    const token = jwt.sign({ uuid: user.uuid }, process.env.JWT_SECRET, {
+      expiresIn: '1h'
+    });
+
+    // Send only the token
+    res.status(200).json({ token });
   } catch (error) {
     res.status(400).send({ message: 'Failed to create user', error: error.message });
   }
