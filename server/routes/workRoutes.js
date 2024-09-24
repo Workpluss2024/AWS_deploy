@@ -1,10 +1,18 @@
-import { Router } from 'express';
-const router = Router();
-import { createWork, getWork, updateWork, deleteWork } from '../controllers/workController.js';
+import express from 'express';
+import {
+  createWork,
+  getAllWorks,
+  getWorkById,
+  updateWork,
+  deleteWork,
+} from '../controllers/workController.js';
 
-router.post('/', createWork);
-router.get('/:id', getWork);
-router.put('/:id', updateWork);
-router.delete('/:id', deleteWork);
+const router = express.Router();
+
+router.post('/work', createWork);
+router.get('/work', getAllWorks);
+router.get('/work/:id', getWorkById);
+router.put('/work/:id', updateWork);
+router.delete('/work/:id', deleteWork);
 
 export default router;
