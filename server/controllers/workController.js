@@ -1,4 +1,4 @@
-import Work from '../models/work.js';  
+import Work from '../models/Work.js';  
 
 // Create a new job post
 export const createWork = async (req, res) => {
