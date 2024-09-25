@@ -1,4 +1,6 @@
-import express from 'express';
+import { Router } from 'express';
+const router = Router();
+
 import {
   createWork,
   getAllWorks,
@@ -7,12 +9,11 @@ import {
   deleteWork,
 } from '../controllers/workController.js';
 
-const router = express.Router();
-
-router.post('/work', createWork);
-router.get('/work', getAllWorks);
-router.get('/work/:id', getWorkById);
-router.put('/work/:id', updateWork);
-router.delete('/work/:id', deleteWork);
+// Routes for work posts
+router.post('/', createWork);            // Create a new job post
+router.get('/', getAllWorks);            // Get all job posts
+router.get('/:id', getWorkById);         // Get a job post by ID
+router.put('/:id', updateWork);          // Update a job post by ID
+router.delete('/:id', deleteWork);       // Delete a job post by ID
 
 export default router;
