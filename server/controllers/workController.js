@@ -1,4 +1,5 @@
-import Work from '../models/Work.js';  
+import Work from '../models/Work.js';
+import jwt from 'jsonwebtoken'; // For JWT authentication
 
 // Create a new job post
 export const createWork = async (req, res) => {
@@ -15,6 +16,11 @@ export const createWork = async (req, res) => {
     maxPerHourAmount,
     totalAmount,
   } = req.body;
+
+  // Input validation (this could be moved to a validation module)
+  if (!jobTitle || !description || !postalAddress || !totalAmount) {
+    return res.status(400).json({ message: 'Missing required fields: jobTitle, description, postalAddress, totalAmount' });
+  }
 
   try {
     // Create new work post
@@ -34,7 +40,8 @@ export const createWork = async (req, res) => {
 
     await newWork.save();
 
-    return res.status(200).json({ message: 'Job post created successfully', uuid: newWork.uuid });
+    // Return the newly created job post with status 201
+    return res.status(201).json({ message: 'Job post created successfully', newWork });
   } catch (error) {
     return res.status(500).json({ message: 'Error creating job post', error: error.message });
   }
@@ -99,5 +106,22 @@ export const deleteWork = async (req, res) => {
     return res.status(200).json({ message: 'Job post deleted successfully' });
   } catch (error) {
     return res.status(500).json({ message: 'Error deleting job post', error: error.message });
+  }
+};
+
+// Middleware for verifying JWT
+export const authenticateUser = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).json({ message: 'Access denied. No token provided.' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;  // Attach decoded user to the request
+    next();  // Continue to the next middleware/route handler
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid token' });
   }
 };
